@@ -307,6 +307,7 @@ typedef struct RE_Node {
     RE_STATUS_T status;
     RE_UINT8 op;
     BOOL match;
+    RE_UINT32 cpta_loc;
 } RE_Node;
 
 /* Span of a guard (inclusive range). */
@@ -3465,6 +3466,7 @@ Py_LOCAL_INLINE(BOOL) any_case(Py_UCS4 ch, int case_count, Py_UCS4* cases) {
 Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY(RE_State* state, RE_Node* node,
   Py_ssize_t text_pos, Py_ssize_t limit, BOOL match) {
     void* text;
+    char cpta_first_iter;
 
     text = state->text;
 
@@ -3477,7 +3479,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr < limit_ptr && (text_ptr[0] != '\n') == match)
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && (text_ptr[0] != '\n') == match)
             ++text_ptr;
 
         text_pos = text_ptr - (Py_UCS1*)text;
@@ -3491,7 +3493,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr < limit_ptr && (text_ptr[0] != '\n') == match)
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && (text_ptr[0] != '\n') == match)
             ++text_ptr;
 
         text_pos = text_ptr - (Py_UCS2*)text;
@@ -3505,7 +3507,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr < limit_ptr && (text_ptr[0] != '\n') == match)
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && (text_ptr[0] != '\n') == match)
             ++text_ptr;
 
         text_pos = text_ptr - (Py_UCS4*)text;
@@ -3520,6 +3522,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY(RE_State* state, RE_Node* node,
 Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY_REV(RE_State* state, RE_Node* node,
   Py_ssize_t text_pos, Py_ssize_t limit, BOOL match) {
     void* text;
+    char cpta_first_iter;
 
     text = state->text;
 
@@ -3532,7 +3535,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY_REV(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr > limit_ptr && (text_ptr[-1] != '\n') == match)
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && (text_ptr[-1] != '\n') == match)
             --text_ptr;
 
         text_pos = text_ptr - (Py_UCS1*)text;
@@ -3546,7 +3549,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY_REV(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr > limit_ptr && (text_ptr[-1] != '\n') == match)
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && (text_ptr[-1] != '\n') == match)
             --text_ptr;
 
         text_pos = text_ptr - (Py_UCS2*)text;
@@ -3560,7 +3563,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY_REV(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr > limit_ptr && (text_ptr[-1] != '\n') == match)
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && (text_ptr[-1] != '\n') == match)
             --text_ptr;
 
         text_pos = text_ptr - (Py_UCS4*)text;
@@ -3576,6 +3579,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY_U(RE_State* state, RE_Node* node,
   Py_ssize_t text_pos, Py_ssize_t limit, BOOL match) {
     void* text;
     RE_EncodingTable* encoding;
+    char cpta_first_iter;
 
     text = state->text;
     encoding = state->encoding;
@@ -3590,11 +3594,11 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY_U(RE_State* state, RE_Node* node,
         limit_ptr = (Py_UCS1*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr < limit_ptr && unicode_is_line_sep(text_ptr[0]) !=
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && unicode_is_line_sep(text_ptr[0]) !=
               match)
                 ++text_ptr;
         } else {
-            while (text_ptr < limit_ptr && ascii_is_line_sep(text_ptr[0]) !=
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && ascii_is_line_sep(text_ptr[0]) !=
               match)
                 ++text_ptr;
         }
@@ -3611,11 +3615,11 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY_U(RE_State* state, RE_Node* node,
         limit_ptr = (Py_UCS2*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr < limit_ptr && unicode_is_line_sep(text_ptr[0]) !=
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && unicode_is_line_sep(text_ptr[0]) !=
               match)
                 ++text_ptr;
         } else {
-            while (text_ptr < limit_ptr && ascii_is_line_sep(text_ptr[0]) !=
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && ascii_is_line_sep(text_ptr[0]) !=
               match)
                 ++text_ptr;
         }
@@ -3632,11 +3636,11 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY_U(RE_State* state, RE_Node* node,
         limit_ptr = (Py_UCS4*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr < limit_ptr && unicode_is_line_sep(text_ptr[0]) !=
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && unicode_is_line_sep(text_ptr[0]) !=
               match)
                 ++text_ptr;
         } else {
-            while (text_ptr < limit_ptr && ascii_is_line_sep(text_ptr[0]) !=
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && ascii_is_line_sep(text_ptr[0]) !=
               match)
                 ++text_ptr;
         }
@@ -3654,6 +3658,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY_U_REV(RE_State* state, RE_Node*
   node, Py_ssize_t text_pos, Py_ssize_t limit, BOOL match) {
     void* text;
     RE_EncodingTable* encoding;
+    char cpta_first_iter;
 
     text = state->text;
     encoding = state->encoding;
@@ -3668,11 +3673,11 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY_U_REV(RE_State* state, RE_Node*
         limit_ptr = (Py_UCS1*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr > limit_ptr && unicode_is_line_sep(text_ptr[-1]) !=
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && unicode_is_line_sep(text_ptr[-1]) !=
               match)
                 --text_ptr;
         } else {
-            while (text_ptr > limit_ptr && ascii_is_line_sep(text_ptr[-1]) !=
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && ascii_is_line_sep(text_ptr[-1]) !=
               match)
                 --text_ptr;
         }
@@ -3689,11 +3694,11 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY_U_REV(RE_State* state, RE_Node*
         limit_ptr = (Py_UCS2*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr > limit_ptr && unicode_is_line_sep(text_ptr[-1]) !=
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && unicode_is_line_sep(text_ptr[-1]) !=
               match)
                 --text_ptr;
         } else {
-            while (text_ptr > limit_ptr && ascii_is_line_sep(text_ptr[-1]) !=
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && ascii_is_line_sep(text_ptr[-1]) !=
               match)
                 --text_ptr;
         }
@@ -3710,11 +3715,11 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_ANY_U_REV(RE_State* state, RE_Node*
         limit_ptr = (Py_UCS4*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr > limit_ptr && unicode_is_line_sep(text_ptr[-1]) !=
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && unicode_is_line_sep(text_ptr[-1]) !=
               match)
                 --text_ptr;
         } else {
-            while (text_ptr > limit_ptr && ascii_is_line_sep(text_ptr[-1]) !=
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && ascii_is_line_sep(text_ptr[-1]) !=
               match)
                 --text_ptr;
         }
@@ -3732,6 +3737,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER(RE_State* state, RE_Node*
   node, Py_ssize_t text_pos, Py_ssize_t limit, BOOL match) {
     void* text;
     Py_UCS4 ch;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -3746,7 +3752,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER(RE_State* state, RE_Node*
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr < limit_ptr && (text_ptr[0] == ch) == match)
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && (text_ptr[0] == ch) == match)
             ++text_ptr;
 
         text_pos = text_ptr - (Py_UCS1*)text;
@@ -3760,7 +3766,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER(RE_State* state, RE_Node*
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr < limit_ptr && (text_ptr[0] == ch) == match)
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && (text_ptr[0] == ch) == match)
             ++text_ptr;
 
         text_pos = text_ptr - (Py_UCS2*)text;
@@ -3774,7 +3780,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER(RE_State* state, RE_Node*
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr < limit_ptr && (text_ptr[0] == ch) == match)
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && (text_ptr[0] == ch) == match)
             ++text_ptr;
 
         text_pos = text_ptr - (Py_UCS4*)text;
@@ -3791,6 +3797,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER_IGN(RE_State* state, RE_Node*
     void* text;
     Py_UCS4 cases[RE_MAX_CASES];
     int case_count;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -3806,7 +3813,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER_IGN(RE_State* state, RE_Node*
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr < limit_ptr && any_case(text_ptr[0], case_count, cases)
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && any_case(text_ptr[0], case_count, cases)
           == match)
             ++text_ptr;
 
@@ -3821,7 +3828,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER_IGN(RE_State* state, RE_Node*
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr < limit_ptr && any_case(text_ptr[0], case_count, cases)
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && any_case(text_ptr[0], case_count, cases)
           == match)
             ++text_ptr;
 
@@ -3836,7 +3843,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER_IGN(RE_State* state, RE_Node*
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr < limit_ptr && any_case(text_ptr[0], case_count, cases)
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && any_case(text_ptr[0], case_count, cases)
           == match)
             ++text_ptr;
 
@@ -3854,6 +3861,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER_IGN_REV(RE_State* state,
     void* text;
     Py_UCS4 cases[RE_MAX_CASES];
     int case_count;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -3869,7 +3877,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER_IGN_REV(RE_State* state,
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr > limit_ptr && any_case(text_ptr[-1], case_count,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && any_case(text_ptr[-1], case_count,
           cases) == match)
             --text_ptr;
 
@@ -3884,7 +3892,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER_IGN_REV(RE_State* state,
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr > limit_ptr && any_case(text_ptr[-1], case_count,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && any_case(text_ptr[-1], case_count,
           cases) == match)
             --text_ptr;
 
@@ -3899,7 +3907,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER_IGN_REV(RE_State* state,
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr > limit_ptr && any_case(text_ptr[-1], case_count,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && any_case(text_ptr[-1], case_count,
           cases) == match)
             --text_ptr;
 
@@ -3916,6 +3924,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER_REV(RE_State* state, RE_Node*
   node, Py_ssize_t text_pos, Py_ssize_t limit, BOOL match) {
     void* text;
     Py_UCS4 ch;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -3930,7 +3939,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER_REV(RE_State* state, RE_Node*
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr > limit_ptr && (text_ptr[-1] == ch) == match)
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && (text_ptr[-1] == ch) == match)
             --text_ptr;
 
         text_pos = text_ptr - (Py_UCS1*)text;
@@ -3944,7 +3953,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER_REV(RE_State* state, RE_Node*
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr > limit_ptr && (text_ptr[-1] == ch) == match)
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && (text_ptr[-1] == ch) == match)
             --text_ptr;
 
         text_pos = text_ptr - (Py_UCS2*)text;
@@ -3958,7 +3967,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_CHARACTER_REV(RE_State* state, RE_Node*
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr > limit_ptr && (text_ptr[-1] == ch) == match)
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && (text_ptr[-1] == ch) == match)
             --text_ptr;
 
         text_pos = text_ptr - (Py_UCS4*)text;
@@ -3976,6 +3985,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY(RE_State* state, RE_Node* node,
     RE_EncodingTable* encoding;
     RE_LocaleInfo* locale_info;
     RE_CODE property;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -3993,15 +4003,15 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY(RE_State* state, RE_Node* node,
         limit_ptr = (Py_UCS1*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr < limit_ptr && unicode_has_property(property,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && unicode_has_property(property,
               text_ptr[0]) == match)
                 ++text_ptr;
         } else if (encoding == &ascii_encoding) {
-            while (text_ptr < limit_ptr && ascii_has_property(property,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && ascii_has_property(property,
               text_ptr[0]) == match)
                 ++text_ptr;
         } else {
-            while (text_ptr < limit_ptr && locale_has_property(locale_info,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && locale_has_property(locale_info,
               property,
                 text_ptr[0]) == match)
                 ++text_ptr;
@@ -4019,15 +4029,15 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY(RE_State* state, RE_Node* node,
         limit_ptr = (Py_UCS2*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr < limit_ptr && unicode_has_property(property,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && unicode_has_property(property,
               text_ptr[0]) == match)
                 ++text_ptr;
         } else if (encoding == &ascii_encoding) {
-            while (text_ptr < limit_ptr && ascii_has_property(property,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && ascii_has_property(property,
               text_ptr[0]) == match)
                 ++text_ptr;
         } else {
-            while (text_ptr < limit_ptr && locale_has_property(locale_info,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && locale_has_property(locale_info,
               property,
                 text_ptr[0]) == match)
                 ++text_ptr;
@@ -4045,15 +4055,15 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY(RE_State* state, RE_Node* node,
         limit_ptr = (Py_UCS4*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr < limit_ptr && unicode_has_property(property,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && unicode_has_property(property,
               text_ptr[0]) == match)
                 ++text_ptr;
         } else if (encoding == &ascii_encoding) {
-            while (text_ptr < limit_ptr && ascii_has_property(property,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && ascii_has_property(property,
               text_ptr[0]) == match)
                 ++text_ptr;
         } else {
-            while (text_ptr < limit_ptr && locale_has_property(locale_info,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && locale_has_property(locale_info,
               property,
                 text_ptr[0]) == match)
                 ++text_ptr;
@@ -4074,6 +4084,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY_IGN(RE_State* state, RE_Node*
     RE_EncodingTable* encoding;
     RE_LocaleInfo* locale_info;
     RE_CODE property;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -4091,15 +4102,15 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY_IGN(RE_State* state, RE_Node*
         limit_ptr = (Py_UCS1*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr < limit_ptr && unicode_has_property_ign(property,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && unicode_has_property_ign(property,
               text_ptr[0]) == match)
                 ++text_ptr;
         } else if (encoding == &ascii_encoding) {
-            while (text_ptr < limit_ptr && ascii_has_property_ign(property,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && ascii_has_property_ign(property,
               text_ptr[0]) == match)
                 ++text_ptr;
         } else {
-            while (text_ptr < limit_ptr && locale_has_property_ign(locale_info,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && locale_has_property_ign(locale_info,
               property,
                 text_ptr[0]) == match)
                 ++text_ptr;
@@ -4117,15 +4128,15 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY_IGN(RE_State* state, RE_Node*
         limit_ptr = (Py_UCS2*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr < limit_ptr && unicode_has_property_ign(property,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && unicode_has_property_ign(property,
               text_ptr[0]) == match)
                 ++text_ptr;
         } else if (encoding == &ascii_encoding) {
-            while (text_ptr < limit_ptr && ascii_has_property_ign(property,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && ascii_has_property_ign(property,
               text_ptr[0]) == match)
                 ++text_ptr;
         } else {
-            while (text_ptr < limit_ptr && locale_has_property_ign(locale_info,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && locale_has_property_ign(locale_info,
               property,
                 text_ptr[0]) == match)
                 ++text_ptr;
@@ -4143,15 +4154,15 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY_IGN(RE_State* state, RE_Node*
         limit_ptr = (Py_UCS4*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr < limit_ptr && unicode_has_property_ign(property,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && unicode_has_property_ign(property,
               text_ptr[0]) == match)
                 ++text_ptr;
         } else if (encoding == &ascii_encoding) {
-            while (text_ptr < limit_ptr && ascii_has_property_ign(property,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && ascii_has_property_ign(property,
               text_ptr[0]) == match)
                 ++text_ptr;
         } else {
-            while (text_ptr < limit_ptr && locale_has_property_ign(locale_info,
+            CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && locale_has_property_ign(locale_info,
               property,
                 text_ptr[0]) == match)
                 ++text_ptr;
@@ -4172,6 +4183,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY_IGN_REV(RE_State* state,
     RE_EncodingTable* encoding;
     RE_LocaleInfo* locale_info;
     RE_CODE property;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -4189,15 +4201,15 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY_IGN_REV(RE_State* state,
         limit_ptr = (Py_UCS1*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr > limit_ptr && unicode_has_property_ign(property,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && unicode_has_property_ign(property,
               text_ptr[-1]) == match)
                 --text_ptr;
         } else if (encoding == &ascii_encoding) {
-            while (text_ptr > limit_ptr && ascii_has_property_ign(property,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && ascii_has_property_ign(property,
               text_ptr[-1]) == match)
                 --text_ptr;
         } else {
-            while (text_ptr > limit_ptr && locale_has_property_ign(locale_info,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && locale_has_property_ign(locale_info,
               property,
                 text_ptr[-1]) == match)
                 --text_ptr;
@@ -4215,15 +4227,15 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY_IGN_REV(RE_State* state,
         limit_ptr = (Py_UCS2*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr > limit_ptr && unicode_has_property_ign(property,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && unicode_has_property_ign(property,
               text_ptr[-1]) == match)
                 --text_ptr;
         } else if (encoding == &ascii_encoding) {
-            while (text_ptr > limit_ptr && ascii_has_property_ign(property,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && ascii_has_property_ign(property,
               text_ptr[-1]) == match)
                 --text_ptr;
         } else {
-            while (text_ptr > limit_ptr && locale_has_property_ign(locale_info,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && locale_has_property_ign(locale_info,
               property,
                 text_ptr[-1]) == match)
                 --text_ptr;
@@ -4241,15 +4253,15 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY_IGN_REV(RE_State* state,
         limit_ptr = (Py_UCS4*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr > limit_ptr && unicode_has_property_ign(property,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && unicode_has_property_ign(property,
               text_ptr[-1]) == match)
                 --text_ptr;
         } else if (encoding == &ascii_encoding) {
-            while (text_ptr > limit_ptr && ascii_has_property_ign(property,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && ascii_has_property_ign(property,
               text_ptr[-1]) == match)
                 --text_ptr;
         } else {
-            while (text_ptr > limit_ptr && locale_has_property_ign(locale_info,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && locale_has_property_ign(locale_info,
               property,
                 text_ptr[-1]) == match)
                 --text_ptr;
@@ -4270,6 +4282,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY_REV(RE_State* state, RE_Node*
     RE_EncodingTable* encoding;
     RE_LocaleInfo* locale_info;
     RE_CODE property;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -4287,15 +4300,15 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY_REV(RE_State* state, RE_Node*
         limit_ptr = (Py_UCS1*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr > limit_ptr && unicode_has_property(property,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && unicode_has_property(property,
               text_ptr[-1]) == match)
                 --text_ptr;
         } else if (encoding == &ascii_encoding) {
-            while (text_ptr > limit_ptr && ascii_has_property(property,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && ascii_has_property(property,
               text_ptr[-1]) == match)
                 --text_ptr;
         } else {
-            while (text_ptr > limit_ptr && locale_has_property(locale_info,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && locale_has_property(locale_info,
               property,
                 text_ptr[-1]) == match)
                 --text_ptr;
@@ -4313,15 +4326,15 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY_REV(RE_State* state, RE_Node*
         limit_ptr = (Py_UCS2*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr > limit_ptr && unicode_has_property(property,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && unicode_has_property(property,
               text_ptr[-1]) == match)
                 --text_ptr;
         } else if (encoding == &ascii_encoding) {
-            while (text_ptr > limit_ptr && ascii_has_property(property,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && ascii_has_property(property,
               text_ptr[-1]) == match)
                 --text_ptr;
         } else {
-            while (text_ptr > limit_ptr && locale_has_property(locale_info,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && locale_has_property(locale_info,
               property,
                 text_ptr[-1]) == match)
                 --text_ptr;
@@ -4339,15 +4352,15 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_PROPERTY_REV(RE_State* state, RE_Node*
         limit_ptr = (Py_UCS4*)text + limit;
 
         if (encoding == &unicode_encoding) {
-            while (text_ptr > limit_ptr && unicode_has_property(property,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && unicode_has_property(property,
               text_ptr[-1]) == match)
                 --text_ptr;
         } else if (encoding == &ascii_encoding) {
-            while (text_ptr > limit_ptr && ascii_has_property(property,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && ascii_has_property(property,
               text_ptr[-1]) == match)
                 --text_ptr;
         } else {
-            while (text_ptr > limit_ptr && locale_has_property(locale_info,
+            CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && locale_has_property(locale_info,
               property,
                 text_ptr[-1]) == match)
                 --text_ptr;
@@ -4367,6 +4380,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE(RE_State* state, RE_Node* node,
     void* text;
     RE_EncodingTable* encoding;
     RE_LocaleInfo* locale_info;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -4382,7 +4396,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr < limit_ptr && matches_RANGE(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && matches_RANGE(encoding, locale_info,
           node, text_ptr[0]) == match)
             ++text_ptr;
 
@@ -4397,7 +4411,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr < limit_ptr && matches_RANGE(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && matches_RANGE(encoding, locale_info,
           node, text_ptr[0]) == match)
             ++text_ptr;
 
@@ -4412,7 +4426,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr < limit_ptr && matches_RANGE(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && matches_RANGE(encoding, locale_info,
           node, text_ptr[0]) == match)
             ++text_ptr;
 
@@ -4430,6 +4444,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE_IGN(RE_State* state, RE_Node*
     void* text;
     RE_EncodingTable* encoding;
     RE_LocaleInfo* locale_info;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -4445,7 +4460,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE_IGN(RE_State* state, RE_Node*
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr < limit_ptr && matches_RANGE_IGN(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && matches_RANGE_IGN(encoding, locale_info,
           node, text_ptr[0]) == match)
             ++text_ptr;
 
@@ -4460,7 +4475,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE_IGN(RE_State* state, RE_Node*
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr < limit_ptr && matches_RANGE_IGN(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && matches_RANGE_IGN(encoding, locale_info,
           node, text_ptr[0]) == match)
             ++text_ptr;
 
@@ -4475,7 +4490,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE_IGN(RE_State* state, RE_Node*
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr < limit_ptr && matches_RANGE_IGN(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && matches_RANGE_IGN(encoding, locale_info,
           node, text_ptr[0]) == match)
             ++text_ptr;
 
@@ -4493,6 +4508,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE_IGN_REV(RE_State* state, RE_Node*
     void* text;
     RE_EncodingTable* encoding;
     RE_LocaleInfo* locale_info;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -4508,7 +4524,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE_IGN_REV(RE_State* state, RE_Node*
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr > limit_ptr && matches_RANGE_IGN(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && matches_RANGE_IGN(encoding, locale_info,
           node, text_ptr[-1]) == match)
             --text_ptr;
 
@@ -4523,7 +4539,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE_IGN_REV(RE_State* state, RE_Node*
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr > limit_ptr && matches_RANGE_IGN(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && matches_RANGE_IGN(encoding, locale_info,
           node, text_ptr[-1]) == match)
             --text_ptr;
 
@@ -4538,7 +4554,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE_IGN_REV(RE_State* state, RE_Node*
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr > limit_ptr && matches_RANGE_IGN(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && matches_RANGE_IGN(encoding, locale_info,
           node, text_ptr[-1]) == match)
             --text_ptr;
 
@@ -4556,6 +4572,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE_REV(RE_State* state, RE_Node*
     void* text;
     RE_EncodingTable* encoding;
     RE_LocaleInfo* locale_info;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -4571,7 +4588,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE_REV(RE_State* state, RE_Node*
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr > limit_ptr && matches_RANGE(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && matches_RANGE(encoding, locale_info,
           node, text_ptr[-1]) == match)
             --text_ptr;
 
@@ -4586,7 +4603,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE_REV(RE_State* state, RE_Node*
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr > limit_ptr && matches_RANGE(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && matches_RANGE(encoding, locale_info,
           node, text_ptr[-1]) == match)
             --text_ptr;
 
@@ -4601,7 +4618,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_RANGE_REV(RE_State* state, RE_Node*
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr > limit_ptr && matches_RANGE(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && matches_RANGE(encoding, locale_info,
           node, text_ptr[-1]) == match)
             --text_ptr;
 
@@ -4619,6 +4636,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET(RE_State* state, RE_Node* node,
     void* text;
     RE_EncodingTable* encoding;
     RE_LocaleInfo* locale_info;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -4634,7 +4652,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr < limit_ptr && matches_SET(encoding, locale_info, node,
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && matches_SET(encoding, locale_info, node,
           text_ptr[0]) == match)
             ++text_ptr;
 
@@ -4649,7 +4667,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr < limit_ptr && matches_SET(encoding, locale_info, node,
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && matches_SET(encoding, locale_info, node,
           text_ptr[0]) == match)
             ++text_ptr;
 
@@ -4664,7 +4682,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr < limit_ptr && matches_SET(encoding, locale_info, node,
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && matches_SET(encoding, locale_info, node,
           text_ptr[0]) == match)
             ++text_ptr;
 
@@ -4682,6 +4700,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET_IGN(RE_State* state, RE_Node* node,
     void* text;
     RE_EncodingTable* encoding;
     RE_LocaleInfo* locale_info;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -4697,7 +4716,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET_IGN(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr < limit_ptr && matches_SET_IGN(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && matches_SET_IGN(encoding, locale_info,
           node, text_ptr[0]) == match)
             ++text_ptr;
 
@@ -4712,7 +4731,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET_IGN(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr < limit_ptr && matches_SET_IGN(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && matches_SET_IGN(encoding, locale_info,
           node, text_ptr[0]) == match)
             ++text_ptr;
 
@@ -4727,7 +4746,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET_IGN(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr < limit_ptr && matches_SET_IGN(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr < limit_ptr && matches_SET_IGN(encoding, locale_info,
           node, text_ptr[0]) == match)
             ++text_ptr;
 
@@ -4745,6 +4764,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET_IGN_REV(RE_State* state, RE_Node*
     void* text;
     RE_EncodingTable* encoding;
     RE_LocaleInfo* locale_info;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -4760,7 +4780,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET_IGN_REV(RE_State* state, RE_Node*
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr > limit_ptr && matches_SET_IGN(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && matches_SET_IGN(encoding, locale_info,
           node, text_ptr[-1]) == match)
             --text_ptr;
 
@@ -4775,7 +4795,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET_IGN_REV(RE_State* state, RE_Node*
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr > limit_ptr && matches_SET_IGN(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && matches_SET_IGN(encoding, locale_info,
           node, text_ptr[-1]) == match)
             --text_ptr;
 
@@ -4790,7 +4810,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET_IGN_REV(RE_State* state, RE_Node*
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr > limit_ptr && matches_SET_IGN(encoding, locale_info,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && matches_SET_IGN(encoding, locale_info,
           node, text_ptr[-1]) == match)
             --text_ptr;
 
@@ -4808,6 +4828,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET_REV(RE_State* state, RE_Node* node,
     void* text;
     RE_EncodingTable* encoding;
     RE_LocaleInfo* locale_info;
+    char cpta_first_iter;
 
     text = state->text;
     match = node->match == match;
@@ -4823,7 +4844,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET_REV(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS1*)text + text_pos;
         limit_ptr = (Py_UCS1*)text + limit;
 
-        while (text_ptr > limit_ptr && matches_SET(encoding, locale_info, node,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && matches_SET(encoding, locale_info, node,
           text_ptr[-1]) == match)
             --text_ptr;
 
@@ -4838,7 +4859,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET_REV(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS2*)text + text_pos;
         limit_ptr = (Py_UCS2*)text + limit;
 
-        while (text_ptr > limit_ptr && matches_SET(encoding, locale_info, node,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && matches_SET(encoding, locale_info, node,
           text_ptr[-1]) == match)
             --text_ptr;
 
@@ -4853,7 +4874,7 @@ Py_LOCAL_INLINE(Py_ssize_t) match_many_SET_REV(RE_State* state, RE_Node* node,
         text_ptr = (Py_UCS4*)text + text_pos;
         limit_ptr = (Py_UCS4*)text + limit;
 
-        while (text_ptr > limit_ptr && matches_SET(encoding, locale_info, node,
+        CPTA_REP_LATE_WHILE (text_ptr > limit_ptr && matches_SET(encoding, locale_info, node,
           text_ptr[-1]) == match)
             --text_ptr;
 
@@ -4874,6 +4895,8 @@ Py_LOCAL_INLINE(size_t) count_one(RE_State* state, RE_Node* node, Py_ssize_t
 
     if (max_count < 1)
         return 0;
+
+    __cpytraceafl_record_loc(node->cpta_loc);
 
     switch (node->op) {
     case RE_OP_ANY:
@@ -5113,6 +5136,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search(RE_State* state, RE_Node*
     Py_ssize_t length;
     RE_CODE* values;
     Py_UCS4 check_char;
+    RE_UINT32 cpta_loc;
 
     length = (Py_ssize_t)node->value_count;
     values = node->values;
@@ -5133,7 +5157,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search(RE_State* state, RE_Node*
 
                 s_pos = 1;
 
-                for (;;) {
+                CPTA_STRING_EARLY_WHILE (1) {
                     if (s_pos >= length)
                         /* End of search string. */
                         return text_ptr - text;
@@ -5174,7 +5198,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search(RE_State* state, RE_Node*
 
                 s_pos = 1;
 
-                for (;;) {
+                CPTA_STRING_EARLY_WHILE (1) {
                     if (s_pos >= length)
                         /* End of search string. */
                         return text_ptr - text;
@@ -5215,7 +5239,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search(RE_State* state, RE_Node*
 
                 s_pos = 1;
 
-                for (;;) {
+                CPTA_STRING_EARLY_WHILE (1) {
                     if (s_pos >= length)
                         /* End of search string. */
                         return text_ptr - text;
@@ -5265,6 +5289,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search_ign(RE_State* state, RE_Node*
     RE_LocaleInfo* locale_info;
     Py_UCS4 cases[RE_MAX_CASES];
     int case_count;
+    RE_UINT32 cpta_loc;
 
     length = (Py_ssize_t)node->value_count;
     values = node->values;
@@ -5287,7 +5312,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search_ign(RE_State* state, RE_Node*
 
                 s_pos = 1;
 
-                for (;;) {
+                CPTA_STRING_EARLY_WHILE (1) {
                     if (s_pos >= length)
                         /* End of search string. */
                         return text_ptr - text;
@@ -5329,7 +5354,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search_ign(RE_State* state, RE_Node*
 
                 s_pos = 1;
 
-                for (;;) {
+                CPTA_STRING_EARLY_WHILE (1) {
                     if (s_pos >= length)
                         /* End of search string. */
                         return text_ptr - text;
@@ -5371,7 +5396,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search_ign(RE_State* state, RE_Node*
 
                 s_pos = 1;
 
-                for (;;) {
+                CPTA_STRING_EARLY_WHILE (1) {
                     if (s_pos >= length)
                         /* End of search string. */
                         return text_ptr - text;
@@ -5422,6 +5447,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search_ign_rev(RE_State* state,
     RE_LocaleInfo* locale_info;
     Py_UCS4 cases[RE_MAX_CASES];
     int case_count;
+    RE_UINT32 cpta_loc;
 
     length = (Py_ssize_t)node->value_count;
     values = node->values;
@@ -5444,7 +5470,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search_ign_rev(RE_State* state,
 
                 s_pos = 1;
 
-                for (;;) {
+                CPTA_STRING_EARLY_WHILE (1) {
                     if (s_pos >= length)
                         /* End of search string. */
                         return text_ptr - text;
@@ -5486,7 +5512,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search_ign_rev(RE_State* state,
 
                 s_pos = 1;
 
-                for (;;) {
+                CPTA_STRING_EARLY_WHILE (1) {
                     if (s_pos >= length)
                         /* End of search string. */
                         return text_ptr - text;
@@ -5528,7 +5554,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search_ign_rev(RE_State* state,
 
                 s_pos = 1;
 
-                for (;;) {
+                CPTA_STRING_EARLY_WHILE (1) {
                     if (s_pos >= length)
                         /* End of search string. */
                         return text_ptr - text;
@@ -5576,6 +5602,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search_rev(RE_State* state, RE_Node*
     Py_ssize_t length;
     RE_CODE* values;
     Py_UCS4 check_char;
+    RE_UINT32 cpta_loc;
 
     length = (Py_ssize_t)node->value_count;
     values = node->values;
@@ -5596,7 +5623,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search_rev(RE_State* state, RE_Node*
 
                 s_pos = 1;
 
-                for (;;) {
+                CPTA_STRING_EARLY_WHILE (1) {
                     if (s_pos >= length)
                         /* End of search string. */
                         return text_ptr - text;
@@ -5638,7 +5665,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search_rev(RE_State* state, RE_Node*
 
                 s_pos = 1;
 
-                for (;;) {
+                CPTA_STRING_EARLY_WHILE (1) {
                     if (s_pos >= length)
                         /* End of search string. */
                         return text_ptr - text;
@@ -5680,7 +5707,7 @@ Py_LOCAL_INLINE(Py_ssize_t) simple_string_search_rev(RE_State* state, RE_Node*
 
                 s_pos = 1;
 
-                for (;;) {
+                CPTA_STRING_EARLY_WHILE (1) {
                     if (s_pos >= length)
                         /* End of search string. */
                         return text_ptr - text;
@@ -5732,6 +5759,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search(RE_State* state, RE_Node* node,
     Py_ssize_t* good_suffix_offset;
     Py_ssize_t last_pos;
     Py_UCS4 check_char;
+    RE_UINT32 cpta_loc;
 
     text = state->text;
     length = (Py_ssize_t)node->value_count;
@@ -5759,7 +5787,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search(RE_State* state, RE_Node* node,
                 Py_ssize_t pos;
 
                 pos = last_pos - 1;
-                while (pos >= 0 && same_char(text_ptr[pos], values[pos]))
+                CPTA_STRING_EARLY_WHILE (pos >= 0 && same_char(text_ptr[pos], values[pos]))
                     --pos;
 
                 if (pos < 0)
@@ -5787,7 +5815,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search(RE_State* state, RE_Node* node,
                 Py_ssize_t pos;
 
                 pos = last_pos - 1;
-                while (pos >= 0 && same_char(text_ptr[pos], values[pos]))
+                CPTA_STRING_EARLY_WHILE (pos >= 0 && same_char(text_ptr[pos], values[pos]))
                     --pos;
 
                 if (pos < 0)
@@ -5815,7 +5843,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search(RE_State* state, RE_Node* node,
                 Py_ssize_t pos;
 
                 pos = last_pos - 1;
-                while (pos >= 0 && same_char(text_ptr[pos], values[pos]))
+                CPTA_STRING_EARLY_WHILE (pos >= 0 && same_char(text_ptr[pos], values[pos]))
                     --pos;
 
                 if (pos < 0)
@@ -5845,6 +5873,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search_ign(RE_State* state, RE_Node*
     Py_ssize_t last_pos;
     Py_UCS4 cases[RE_MAX_CASES];
     int case_count;
+    RE_UINT32 cpta_loc;
 
     encoding = state->encoding;
     locale_info = state->locale_info;
@@ -5874,7 +5903,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search_ign(RE_State* state, RE_Node*
                 Py_ssize_t pos;
 
                 pos = last_pos - 1;
-                while (pos >= 0 && same_char_ign(encoding, locale_info,
+                CPTA_STRING_EARLY_WHILE (pos >= 0 && same_char_ign(encoding, locale_info,
                   text_ptr[pos], values[pos]))
                     --pos;
 
@@ -5903,7 +5932,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search_ign(RE_State* state, RE_Node*
                 Py_ssize_t pos;
 
                 pos = last_pos - 1;
-                while (pos >= 0 && same_char_ign(encoding, locale_info,
+                CPTA_STRING_EARLY_WHILE (pos >= 0 && same_char_ign(encoding, locale_info,
                   text_ptr[pos], values[pos]))
                     --pos;
 
@@ -5932,7 +5961,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search_ign(RE_State* state, RE_Node*
                 Py_ssize_t pos;
 
                 pos = last_pos - 1;
-                while (pos >= 0 && same_char_ign(encoding, locale_info,
+                CPTA_STRING_EARLY_WHILE (pos >= 0 && same_char_ign(encoding, locale_info,
                   text_ptr[pos], values[pos]))
                     --pos;
 
@@ -5962,6 +5991,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search_ign_rev(RE_State* state,
     Py_ssize_t* good_suffix_offset;
     Py_UCS4 cases[RE_MAX_CASES];
     int case_count;
+    RE_UINT32 cpta_loc;
 
     encoding = state->encoding;
     locale_info = state->locale_info;
@@ -5990,7 +6020,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search_ign_rev(RE_State* state,
                 Py_ssize_t pos;
 
                 pos = 1;
-                while (pos < length && same_char_ign(encoding, locale_info,
+                CPTA_STRING_EARLY_WHILE (pos < length && same_char_ign(encoding, locale_info,
                   text_ptr[pos], values[pos]))
                     ++pos;
 
@@ -6019,7 +6049,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search_ign_rev(RE_State* state,
                 Py_ssize_t pos;
 
                 pos = 1;
-                while (pos < length && same_char_ign(encoding, locale_info,
+                CPTA_STRING_EARLY_WHILE (pos < length && same_char_ign(encoding, locale_info,
                   text_ptr[pos], values[pos]))
                     ++pos;
 
@@ -6048,7 +6078,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search_ign_rev(RE_State* state,
                 Py_ssize_t pos;
 
                 pos = 1;
-                while (pos < length && same_char_ign(encoding, locale_info,
+                CPTA_STRING_EARLY_WHILE (pos < length && same_char_ign(encoding, locale_info,
                   text_ptr[pos], values[pos]))
                     ++pos;
 
@@ -6075,6 +6105,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search_rev(RE_State* state, RE_Node*
     Py_ssize_t* bad_character_offset;
     Py_ssize_t* good_suffix_offset;
     Py_UCS4 check_char;
+    RE_UINT32 cpta_loc;
 
     text = state->text;
     length = (Py_ssize_t)node->value_count;
@@ -6101,7 +6132,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search_rev(RE_State* state, RE_Node*
                 Py_ssize_t pos;
 
                 pos = 1;
-                while (pos < length && same_char(text_ptr[pos], values[pos]))
+                CPTA_STRING_EARLY_WHILE (pos < length && same_char(text_ptr[pos], values[pos]))
                     ++pos;
 
                 if (pos >= length)
@@ -6129,7 +6160,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search_rev(RE_State* state, RE_Node*
                 Py_ssize_t pos;
 
                 pos = 1;
-                while (pos < length && same_char(text_ptr[pos], values[pos]))
+                CPTA_STRING_EARLY_WHILE (pos < length && same_char(text_ptr[pos], values[pos]))
                     ++pos;
 
                 if (pos >= length)
@@ -6157,7 +6188,7 @@ Py_LOCAL_INLINE(Py_ssize_t) fast_string_search_rev(RE_State* state, RE_Node*
                 Py_ssize_t pos;
 
                 pos = 1;
-                while (pos < length && same_char(text_ptr[pos], values[pos]))
+                CPTA_STRING_EARLY_WHILE (pos < length && same_char(text_ptr[pos], values[pos]))
                     ++pos;
 
                 if (pos >= length)
@@ -7222,12 +7253,13 @@ Py_LOCAL_INLINE(int) try_match_STRING(RE_State* state, RE_NextNode* next,
     Py_UCS4 (*char_at)(void* text, Py_ssize_t pos);
     RE_CODE* values;
     Py_ssize_t s_pos;
+    RE_UINT32 cpta_loc;
 
     length = (Py_ssize_t)node->value_count;
     char_at = state->char_at;
     values = node->values;
 
-    for (s_pos = 0; s_pos < length; s_pos++) {
+    CPTA_STRING_LATE_FOR (s_pos = 0; s_pos < length; s_pos++) {
         if (text_pos + s_pos >= state->slice_end) {
             if (state->partial_side == RE_PARTIAL_RIGHT) {
                 next_position->text_pos = text_pos;
@@ -7262,6 +7294,8 @@ Py_LOCAL_INLINE(int) try_match_STRING_FLD(RE_State* state, RE_NextNode* next,
     int f_pos;
     Py_ssize_t start_pos;
     Py_UCS4 folded[RE_MAX_FOLDED];
+    RE_UINT32 cpta_loc;
+    char cpta_first_iter;
 
     length = (Py_ssize_t)node->value_count;
     char_at = state->char_at;
@@ -7275,7 +7309,7 @@ Py_LOCAL_INLINE(int) try_match_STRING_FLD(RE_State* state, RE_NextNode* next,
     f_pos = 0;
     start_pos = text_pos;
 
-    while (s_pos < length) {
+    CPTA_STRING_LATE_WHILE (s_pos < length) {
         if (f_pos >= folded_len) {
             /* Fetch and casefold another character. */
             if (text_pos >= state->slice_end) {
@@ -7335,6 +7369,8 @@ Py_LOCAL_INLINE(int) try_match_STRING_FLD_REV(RE_State* state, RE_NextNode*
     int f_pos;
     Py_ssize_t start_pos;
     Py_UCS4 folded[RE_MAX_FOLDED];
+    RE_UINT32 cpta_loc;
+    char cpta_first_iter;
 
     length = (Py_ssize_t)node->value_count;
     char_at = state->char_at;
@@ -7348,7 +7384,7 @@ Py_LOCAL_INLINE(int) try_match_STRING_FLD_REV(RE_State* state, RE_NextNode*
     f_pos = 0;
     start_pos = text_pos;
 
-    while (s_pos < length) {
+    CPTA_STRING_LATE_WHILE (s_pos < length) {
         if (f_pos >= folded_len) {
             /* Fetch and casefold another character. */
             if (text_pos <= state->slice_start) {
@@ -7400,6 +7436,7 @@ Py_LOCAL_INLINE(int) try_match_STRING_IGN(RE_State* state, RE_NextNode* next,
     RE_LocaleInfo* locale_info;
     RE_CODE* values;
     Py_ssize_t s_pos;
+    RE_UINT32 cpta_loc;
 
     length = (Py_ssize_t)node->value_count;
     char_at = state->char_at;
@@ -7407,7 +7444,7 @@ Py_LOCAL_INLINE(int) try_match_STRING_IGN(RE_State* state, RE_NextNode* next,
     locale_info = state->locale_info;
     values = node->values;
 
-    for (s_pos = 0; s_pos < length; s_pos++) {
+    CPTA_STRING_LATE_FOR (s_pos = 0; s_pos < length; s_pos++) {
         if (text_pos + s_pos >= state->slice_end) {
             if (state->partial_side == RE_PARTIAL_RIGHT) {
                 next_position->text_pos = text_pos;
@@ -7439,6 +7476,7 @@ Py_LOCAL_INLINE(int) try_match_STRING_IGN_REV(RE_State* state, RE_NextNode*
     RE_LocaleInfo* locale_info;
     RE_CODE* values;
     Py_ssize_t s_pos;
+    RE_UINT32 cpta_loc;
 
     length = (Py_ssize_t)node->value_count;
     char_at = state->char_at;
@@ -7446,7 +7484,7 @@ Py_LOCAL_INLINE(int) try_match_STRING_IGN_REV(RE_State* state, RE_NextNode*
     locale_info = state->locale_info;
     values = node->values;
 
-    for (s_pos = 0; s_pos < length; s_pos++) {
+    CPTA_STRING_LATE_FOR (s_pos = 0; s_pos < length; s_pos++) {
         if (text_pos - s_pos <= state->slice_start) {
             if (state->partial_side == RE_PARTIAL_LEFT) {
                 next_position->text_pos = text_pos;
@@ -7474,12 +7512,13 @@ Py_LOCAL_INLINE(int) try_match_STRING_REV(RE_State* state, RE_NextNode* next,
     Py_UCS4 (*char_at)(void* text, Py_ssize_t pos);
     RE_CODE* values;
     Py_ssize_t s_pos;
+    RE_UINT32 cpta_loc;
 
     length = (Py_ssize_t)node->value_count;
     char_at = state->char_at;
     values = node->values;
 
-    for (s_pos = 0; s_pos < length; s_pos++) {
+    CPTA_STRING_LATE_FOR (s_pos = 0; s_pos < length; s_pos++) {
         if (text_pos - s_pos <= state->slice_start) {
             if (state->partial_side == RE_PARTIAL_LEFT) {
                 next_position->text_pos = text_pos;
@@ -7516,6 +7555,8 @@ Py_LOCAL_INLINE(int) try_match(RE_State* state, RE_NextNode* next, Py_ssize_t
         next_position->text_pos = text_pos;
         return RE_ERROR_SUCCESS;
     }
+
+    __cpytraceafl_record_loc(test->cpta_loc);
 
     switch (test->op) {
     case RE_OP_ANY:
@@ -8276,6 +8317,8 @@ again:
         }
     } else
         info = NULL;
+
+    __cpytraceafl_record_loc(test->cpta_loc);
 
     switch (test->op) {
     case RE_OP_ANY:
@@ -11685,6 +11728,8 @@ Py_LOCAL_INLINE(Py_ssize_t) locate_required_string(RE_State* state, BOOL
          */
         return state->text_pos;
 
+    __cpytraceafl_record_loc(pattern->req_string->cpta_loc);
+
     /* Search for the required string and calculate where to start matching. */
     switch (pattern->req_string->op) {
     case RE_OP_STRING:
@@ -11964,6 +12009,8 @@ Py_LOCAL_INLINE(Py_ssize_t) locate_required_string(RE_State* state, BOOL
 /* Tries to match a character pattern. */
 Py_LOCAL_INLINE(int) match_one(RE_State* state, RE_Node* node, Py_ssize_t
   text_pos) {
+    __cpytraceafl_record_loc(node->cpta_loc);
+
     switch (node->op) {
     case RE_OP_ANY:
         return try_match_ANY(state, node, text_pos);
@@ -12259,6 +12306,8 @@ Py_LOCAL_INLINE(int) basic_match(RE_State* state, BOOL search) {
     RE_Node* node;
     int folded_pos;
     int gfolded_pos;
+    RE_UINT32 cpta_loc;
+    char cpta_first_iter;
     TRACE(("<<basic_match>>\n"))
 
     encoding = state->encoding;
@@ -12445,6 +12494,8 @@ advance:
 
         if (state->iterations == 0 && safe_check_cancel(state))
             return RE_ERROR_CANCELLED;
+
+        __cpytraceafl_record_loc(node->cpta_loc);
 
         switch (node->op) {
         case RE_OP_ANY: /* Any character except a newline. */
@@ -14534,7 +14585,7 @@ advance:
                 string_pos = span->start;
 
             /* Try comparing. */
-            while (string_pos < span->end) {
+            CPTA_STRING_LATE_WHILE (string_pos < span->end) {
                 if (state->text_pos >= state->text_length &&
                   state->partial_side == RE_PARTIAL_RIGHT)
                     return RE_ERROR_PARTIAL;
@@ -14608,7 +14659,7 @@ advance:
             }
 
             /* Try comparing. */
-            while (string_pos < span->end) {
+            CPTA_STRING_LATE_WHILE (string_pos < span->end) {
                 /* Case-fold at current position in text. */
                 if (folded_pos >= folded_len) {
                     if (state->text_pos >= state->text_length &&
@@ -14709,7 +14760,7 @@ advance:
             }
 
             /* Try comparing. */
-            while (string_pos > span->start) {
+            CPTA_STRING_LATE_WHILE (string_pos > span->start) {
                 /* Case-fold at current position in text. */
                 if (folded_pos <= 0) {
                     if (state->text_pos <= 0 && state->partial_side ==
@@ -14792,7 +14843,7 @@ advance:
                 string_pos = span->start;
 
             /* Try comparing. */
-            while (string_pos < span->end) {
+            CPTA_STRING_LATE_WHILE (string_pos < span->end) {
                 if (state->text_pos >= state->text_length &&
                   state->partial_side == RE_PARTIAL_RIGHT)
                     return RE_ERROR_PARTIAL;
@@ -14848,7 +14899,7 @@ advance:
                 string_pos = span->end;
 
             /* Try comparing. */
-            while (string_pos > span->start) {
+            CPTA_STRING_LATE_WHILE (string_pos > span->start) {
                 if (state->text_pos <= 0 && state->partial_side ==
                   RE_PARTIAL_LEFT)
                     return RE_ERROR_PARTIAL;
@@ -14905,7 +14956,7 @@ advance:
                 string_pos = span->end;
 
             /* Try comparing. */
-            while (string_pos > span->start) {
+            CPTA_STRING_LATE_WHILE (string_pos > span->start) {
                 if (state->text_pos <= 0 && state->partial_side ==
                   RE_PARTIAL_LEFT)
                     return RE_ERROR_PARTIAL;
@@ -15252,7 +15303,7 @@ advance:
                 values = node->values;
 
                 /* Try comparing. */
-                while (string_pos < length) {
+                CPTA_STRING_LATE_WHILE (string_pos < length) {
                     if (state->text_pos >= state->text_length &&
                       state->partial_side == RE_PARTIAL_RIGHT)
                         return RE_ERROR_PARTIAL;
@@ -15330,7 +15381,7 @@ advance:
                 values = node->values;
 
                 /* Try comparing. */
-                while (string_pos < length) {
+                CPTA_STRING_LATE_WHILE (string_pos < length) {
                     if (folded_pos >= folded_len) {
                         if (state->text_pos >= state->text_length &&
                           state->partial_side == RE_PARTIAL_RIGHT)
@@ -15438,7 +15489,7 @@ advance:
                 values = node->values;
 
                 /* Try comparing. */
-                while (string_pos > 0) {
+                CPTA_STRING_LATE_WHILE (string_pos > 0) {
                     if (folded_pos <= 0) {
                         if (state->text_pos <= 0 && state->partial_side ==
                           RE_PARTIAL_LEFT)
@@ -15527,7 +15578,7 @@ advance:
                 values = node->values;
 
                 /* Try comparing. */
-                while (string_pos < length) {
+                CPTA_STRING_LATE_WHILE (string_pos < length) {
                     if (state->text_pos >= state->text_length &&
                       state->partial_side == RE_PARTIAL_RIGHT)
                         return RE_ERROR_PARTIAL;
@@ -15585,7 +15636,7 @@ advance:
                 values = node->values;
 
                 /* Try comparing. */
-                while (string_pos > 0) {
+                CPTA_STRING_LATE_WHILE (string_pos > 0) {
                     if (state->text_pos <= 0 && state->partial_side ==
                       RE_PARTIAL_LEFT)
                         return RE_ERROR_PARTIAL;
@@ -15643,7 +15694,7 @@ advance:
                 values = node->values;
 
                 /* Try comparing. */
-                while (string_pos > 0) {
+                CPTA_STRING_LATE_WHILE (string_pos > 0) {
                     if (state->text_pos <= 0 && state->partial_side ==
                       RE_PARTIAL_LEFT)
                         return RE_ERROR_PARTIAL;
@@ -16478,6 +16529,8 @@ backtrack:
                  * literal, so checking specially for it can be a good
                  * optimisation when working with long strings.
                  */
+                __cpytraceafl_record_loc(test->cpta_loc);
+
                 switch (test->op) {
                 case RE_OP_CHARACTER:
                 {
@@ -17076,6 +17129,8 @@ backtrack:
                  * literal, so checking specially for it can be a good
                  * optimisation when working with long strings.
                  */
+                __cpytraceafl_record_loc(test->cpta_loc);
+
                 switch (test->op) {
                 case RE_OP_CHARACTER:
                 {
@@ -26510,6 +26565,7 @@ static PyObject* re_compile(PyObject* self_, PyObject* args) {
     PyObject* required_chars;
     Py_ssize_t req_flags;
     size_t public_group_count;
+    RE_UINT32 cpta_loc_base_hash;
     BOOL unpacked;
     Py_ssize_t code_len;
     RE_CODE* code;
@@ -26523,9 +26579,9 @@ static PyObject* re_compile(PyObject* self_, PyObject* args) {
     BOOL ascii;
     BOOL ok;
 
-    if (!PyArg_ParseTuple(args, "OnOOOOOnOnn:re_compile", &pattern, &flags,
+    if (!PyArg_ParseTuple(args, "OnOOOOOnOnnI:re_compile", &pattern, &flags,
       &code_list, &groupindex, &indexgroup, &named_lists, &named_list_indexes,
-      &req_offset, &required_chars, &req_flags, &public_group_count))
+      &req_offset, &required_chars, &req_flags, &public_group_count, &cpta_loc_base_hash))
         return NULL;
 
     /* If it came from a pickled source, code_list will be a packed code list
@@ -26739,6 +26795,11 @@ static PyObject* re_compile(PyObject* self_, PyObject* args) {
 
     if (unpacked) {
         Py_DECREF(code_list);
+    }
+
+    i = 0;
+    for (RE_UINT32 loc = 0; i < (Py_ssize_t)self->node_count; i++, loc+=CPTA_NODE_LOC_PRIME) {
+        self->node_list[i]->cpta_loc = cpta_loc_base_hash ^ loc;
     }
 
     return (PyObject*)self;

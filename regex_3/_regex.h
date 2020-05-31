@@ -17,6 +17,49 @@
 
 #include "_regex_unicode.h"
 
+#include "cpytraceafl.h"
+
+#if defined(VERBOSE)
+#define _cpytraceafl_record_loc(x) (printf("loc 0x%x @ %s:%d\n", x, __FILE__, __LINE__), cpytraceafl_record_loc(x))
+#else
+#define _cpytraceafl_record_loc(x) cpytraceafl_record_loc(x)
+#endif
+
+#define __cpytraceafl_record_loc(x) _cpytraceafl_record_loc((x) ^ ((x)>>(32-afl_map_size_bits)))
+
+#define CPTA_NODE_LOC_PRIME 0xee4fd665
+#define CPTA_STRING_LOC_PRIME 0xb0529b7b
+
+#define CPTA_STRING_EARLY_WHILE(x) cpta_loc=node->cpta_loc;\
+    while (cpta_loc+=CPTA_STRING_LOC_PRIME, __cpytraceafl_record_loc(cpta_loc), (x))
+
+#define CPTA_STRING_LATE_WHILE(x) cpta_loc=node->cpta_loc;\
+    cpta_first_iter=1;\
+    while (\
+        cpta_first_iter\
+        || (\
+            cpta_loc+=CPTA_STRING_LOC_PRIME,\
+            __cpytraceafl_record_loc(cpta_loc),\
+            1\
+        ),\
+        cpta_first_iter=0,\
+        (x)\
+    )
+
+#define CPTA_STRING_LATE_FOR(...) cpta_loc=node->cpta_loc;\
+    for (__VA_ARGS__, cpta_loc+=CPTA_STRING_LOC_PRIME, __cpytraceafl_record_loc(cpta_loc))
+
+#define CPTA_REP_LATE_WHILE(x) cpta_first_iter=1;\
+    while (\
+        cpta_first_iter\
+        || (\
+            __cpytraceafl_record_loc(node->cpta_loc),\
+            1\
+        ),\
+        cpta_first_iter=0,\
+        (x)\
+    )
+
 /* Operators. */
 #define RE_OP_FAILURE 0
 #define RE_OP_SUCCESS 1

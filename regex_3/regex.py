@@ -618,6 +618,14 @@ def _compile(pattern, flags, ignore_unused, kwargs):
     # The named capture groups.
     index_group = dict((v, n) for n, v in info.group_index.items())
 
+    # mostly cribbed from calculation of pattern_key, with some terms
+    # exchanged for those with deterministic hash values
+    if (info.flags & LOCALE) == 0:
+        pattern_locale = 0
+    args_needed = frozenset(args_needed)
+    cptl_loc_key = (pattern, type(pattern).__name__, flags, args_needed,
+        DEFAULT_VERSION, pattern_locale)
+
     # Create the PatternObject.
     #
     # Local flags like IGNORECASE affect the code generation, but aren't needed
@@ -625,7 +633,7 @@ def _compile(pattern, flags, ignore_unused, kwargs):
     # affect the code generation but _are_ needed by the PatternObject.
     compiled_pattern = _regex.compile(pattern, info.flags | version, code,
       info.group_index, index_group, named_lists, named_list_indexes,
-      req_offset, req_chars, req_flags, info.group_count)
+      req_offset, req_chars, req_flags, info.group_count, hash(cptl_loc_key))
 
     # Do we need to reduce the size of the cache?
     if len(_cache) >= _MAXCACHE:
