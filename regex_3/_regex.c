@@ -27100,6 +27100,20 @@ error:
     return NULL;
 }
 
+/* Simple accessor for Pattern type allows us to avoid compiling/running
+ * a regex on import.
+ */
+static PyObject* _get_pattern_type(PyObject* self_, PyObject* unused) {
+    return &Pattern_Type;
+}
+
+/* Simple accessor for Match type allows us to avoid compiling/running
+ * a regex on import.
+ */
+static PyObject* _get_match_type(PyObject* self_, PyObject* unused) {
+    return &Match_Type;
+}
+
 /* The table of the module's functions. */
 static PyMethodDef _functions[] = {
     {"compile", (PyCFunction)re_compile, METH_VARARGS},
@@ -27109,6 +27123,8 @@ static PyMethodDef _functions[] = {
     {"get_expand_on_folding", (PyCFunction)get_expand_on_folding, METH_NOARGS},
     {"has_property_value", (PyCFunction)has_property_value, METH_VARARGS},
     {"get_all_cases", (PyCFunction)get_all_cases, METH_VARARGS},
+    {"_get_match_type", (PyCFunction)_get_match_type, METH_NOARGS},
+    {"_get_pattern_type", (PyCFunction)_get_pattern_type, METH_NOARGS},
     {NULL, NULL}
 };
 

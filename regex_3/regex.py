@@ -709,8 +709,8 @@ def _compile_replacement_helper(pattern, template):
     return compiled
 
 # We define Pattern here after all the support objects have been defined.
-Pattern = type(_compile('', 0, False, {}))
-Match = type(_compile('', 0, False, {}).match(''))
+Pattern = _regex._get_pattern_type()
+Match = _regex._get_match_type()
 
 # We'll define an alias for the 'compile' function so that the repr of a
 # pattern object is eval-able.
