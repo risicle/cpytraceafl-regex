@@ -41,4 +41,8 @@ setup(
      'regex.test_regex'],
     ext_modules=[Extension('regex._regex', [join(SRC_BASE, '_regex.c'),
       join(SRC_BASE, '_regex_unicode.c')])],
+
+    setup_requires=["pytest-runner"],
+    install_requires=["cpytraceafl==0.7.0"],
+    tests_require=["pytest"],
 )
