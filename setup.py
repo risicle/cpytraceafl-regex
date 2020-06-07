@@ -15,6 +15,7 @@ setup(
     version='0.1.0',  # based on mrab-regex 2020.5.14
     description='A modified version of mrab-regex with added cpytraceafl instrumentation',
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author='Robert Scott',
     author_email='code@humanleg.org.uk',
     url='https://github.com/risicle/cpytraceafl-regex',
