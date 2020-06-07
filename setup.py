@@ -7,17 +7,17 @@ MAJOR, MINOR = sys.version_info[:2]
 
 SRC_BASE = 'regex_%i' % MAJOR
 
-with open('README.rst') as file:
+with open('README.md') as file:
     long_description = file.read()
 
 setup(
-    name='regex',
-    version='2020.5.14',
-    description='Alternative regular expression module, to replace re.',
+    name='cpytraceafl-regex',
+    version='0.1.0',  # based on mrab-regex 2020.5.14
+    description='A modified version of mrab-regex with added cpytraceafl instrumentation',
     long_description=long_description,
-    author='Matthew Barnett',
-    author_email='regex@mrabarnett.plus.com',
-    url='https://bitbucket.org/mrabarnett/mrab-regex',
+    author='Robert Scott',
+    author_email='code@humanleg.org.uk',
+    url='https://github.com/risicle/cpytraceafl-regex',
     license='Python Software Foundation License',
 
     classifiers=[
@@ -43,6 +43,8 @@ setup(
       join(SRC_BASE, '_regex_unicode.c')])],
 
     setup_requires=["pytest-runner"],
+    # apologies for exact version specifier, but there is a binary interface that must be
+    # adhered to
     install_requires=["cpytraceafl==0.7.0"],
     tests_require=["pytest"],
 )
