@@ -4436,7 +4436,7 @@ class Scanner:
         # PatternObject.
         self.scanner = _regex.compile(None, (flags & GLOBAL_FLAGS) | version,
           code, {}, {}, {}, [], req_offset, req_chars, req_flags,
-          len(patterns))
+          len(patterns), hash(tuple(phrase for phrase, _ in lexicon) + (flags,)))
 
     def scan(self, string):
         result = []
