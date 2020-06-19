@@ -12,7 +12,7 @@ with open('README.md') as file:
 
 setup(
     name='cpytraceafl-regex',
-    version='0.1.1',  # based on mrab-regex 2020.5.14
+    version='0.2.0',  # based on mrab-regex 2020.5.14
     description='A modified version of mrab-regex with added cpytraceafl instrumentation',
     long_description=long_description,
     long_description_content_type="text/markdown",
